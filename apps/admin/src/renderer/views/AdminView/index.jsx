@@ -19,14 +19,19 @@ export const AdminView = ({ isUnlocked, setIsUnlocked }) => {
     const [modalPassword, setModalPassword] = useState('')
     const [pendingAction, setPendingAction] = useState(null)
     const [serverInfo, setServerInfo] = useState({ ip: '', port: '' })
+    const [expandedCircuits, setExpandedCircuits] = useState({})
     const dispatch = useDispatch()
+
+    const circuitList = Object.keys(circuits)
 
     useEffect(() => {
         Promise.all([window.api.getLocalIP(), window.api.getServerPort()])
             .then(([ip, port]) => setServerInfo({ ip, port }))
     }, [])
 
-    const circuitList = Object.keys(circuits)
+    const toggleCircuit = (name) => {
+        setExpandedCircuits(prev => ({ ...prev, [name]: !prev[name] }))
+    }
 
     const requireAuth = (action) => {
         if (isUnlocked) {
@@ -127,41 +132,48 @@ export const AdminView = ({ isUnlocked, setIsUnlocked }) => {
                     <ul className="admin__circuit-list">
                         {circuitList.map(name => (
                             <li key={name} className="admin__circuit-item">
-                                <span className="admin__circuit-name">{name}</span>
-                                <div className="admin__circuit-actions">
-                                    <button className="admin__btn admin__btn--secondary" onClick={() => handleUploadImage(name)}>
-                                        Upload image tracé
-                                    </button>
-                                    <button
-                                        className="admin__btn admin__btn--danger"
-                                        onClick={() => handleDeleteCircuit(name)}
-                                    >
-                                        Supprimer
-                                    </button>
+                                <div className="admin__circuit-header">
+                                    <span className="admin__circuit-name">{name}</span>
+                                    <div className="admin__circuit-actions">
+                                        <button className="admin__btn admin__btn--secondary" onClick={() => handleUploadImage(name)}>
+                                            Upload image tracé
+                                        </button>
+                                        <button className="admin__btn admin__btn--secondary" onClick={() => toggleCircuit(name)}>
+                                            {expandedCircuits[name] ? '▲' : '▼'}
+                                        </button>
+                                        <button
+                                            className="admin__btn admin__btn--danger"
+                                            onClick={() => handleDeleteCircuit(name)}
+                                        >
+                                            Supprimer
+                                        </button>
+                                    </div>
                                 </div>
-                                <div className="admin__circuit-entries">
-                                    {['hypercar', 'f1', 'gt3'].map(cat => (
-                                        <div key={cat} className="admin__entries-category">
-                                            <h3 className="admin__entries-category-title">{cat.toUpperCase()}</h3>
-                                            <ul className="admin__entries-list">
-                                                {circuits[name][cat].map((entry, i) => (
-                                                    <li key={entry.id} className="admin__entry-item">
-                                                        <span className="admin__entry-pos">{i + 1}</span>
-                                                        <span className="admin__entry-name">{entry.name}</span>
-                                                        <span className="admin__entry-car">{entry.car || entry.year}</span>
-                                                        <span className="admin__entry-time">{entry.time}</span>
-                                                        <button
-                                                            className="admin__btn admin__btn--danger"
-                                                            onClick={() => handleDeleteEntry(name, cat, entry.id)}
-                                                        >
-                                                            Supprimer
-                                                        </button>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        </div>
-                                    ))}
-                                </div>
+                                {expandedCircuits[name] && (
+                                    <div className="admin__circuit-entries">
+                                        {['hypercar', 'f1', 'gt3'].map(cat => (
+                                            <div key={cat} className="admin__entries-category">
+                                                <h3 className="admin__entries-category-title">{cat.toUpperCase()}</h3>
+                                                <ul className="admin__entries-list">
+                                                    {circuits[name][cat].map((entry, i) => (
+                                                        <li key={entry.id} className="admin__entry-item">
+                                                            <span className="admin__entry-pos">{i + 1}</span>
+                                                            <span className="admin__entry-name">{entry.name}</span>
+                                                            <span className="admin__entry-car">{entry.car || entry.year}</span>
+                                                            <span className="admin__entry-time">{entry.time}</span>
+                                                            <button
+                                                                className="admin__btn admin__btn--danger"
+                                                                onClick={() => handleDeleteEntry(name, cat, entry.id)}
+                                                            >
+                                                                Supprimer
+                                                            </button>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </li>
                         ))}
                     </ul>
