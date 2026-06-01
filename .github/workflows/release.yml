@@ -1,0 +1,70 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-admin:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: npm install
+        working-directory: apps/admin
+      - name: Build
+        run: npm run build:win
+        working-directory: apps/admin
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: admin-installer
+          path: apps/admin/dist-electron/*.exe
+
+  build-display:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: npm install
+        working-directory: apps/display
+      - name: Build
+        run: npm run build:win
+        working-directory: apps/display
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: display-installer
+          path: apps/display/dist-electron/*.exe
+
+  release:
+    needs: [build-admin, build-display]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download admin artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: admin-installer
+          path: artifacts/admin
+      - name: Download display artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: display-installer
+          path: artifacts/display
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            artifacts/admin/*.exe
+            artifacts/display/*.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

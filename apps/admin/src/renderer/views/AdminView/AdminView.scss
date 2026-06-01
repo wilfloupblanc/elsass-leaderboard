@@ -1,0 +1,289 @@
+@use '../../styles/variables' as *;
+
+.admin-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.6rem 4.8rem;
+  background-color: $color-bg-secondary;
+  border-bottom: 1px solid $color-border;
+
+  &__server {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    background-color: $color-bg-card;
+    border: 1px solid $color-border;
+    border-radius: $radius-sm;
+    padding: 0.8rem 1.6rem;
+  }
+
+  &__server-dot {
+    width: 0.8rem;
+    height: 0.8rem;
+    border-radius: 50%;
+    background-color: $color-success;
+    flex-shrink: 0;
+  }
+
+  &__server-address {
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: $color-text;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__logo {
+    height: 4rem;
+    width: auto;
+    object-fit: contain;
+  }
+
+  &__btn {
+    padding: 1rem 2rem;
+    background-color: $color-primary;
+    color: #fff;
+    border: none;
+    border-radius: $radius-sm;
+    font-size: 1.5rem;
+    font-weight: 600;
+    transition: opacity 0.15s;
+
+    &:hover {
+      opacity: 0.85;
+    }
+  }
+}
+
+.admin {
+  padding: 4.8rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 3.2rem;
+
+  &__section {
+    background-color: $color-bg-secondary;
+    border: 1px solid $color-border;
+    border-radius: $radius-lg;
+    padding: 3.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  &__section-title {
+    font-size: 2.2rem;
+    font-weight: 600;
+    color: $color-text;
+    border-bottom: 1px solid $color-border;
+    padding-bottom: 1.2rem;
+  }
+
+  &__row {
+    display: flex;
+    gap: 3.2rem;
+    align-items: flex-start;
+
+    .admin__section {
+      flex: 1;
+    }
+  }
+
+  &__circuit-add {
+    display: flex;
+    gap: 1.2rem;
+  }
+
+  &__circuit-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+  }
+
+  &__circuit-item {
+    background-color: $color-bg-card;
+    border: 1px solid $color-border;
+    border-radius: $radius-md;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+  }
+
+  &__circuit-name {
+    font-weight: 600;
+    font-size: 1.8rem;
+    color: $color-accent;
+  }
+
+  &__circuit-actions {
+    display: flex;
+    gap: 0.8rem;
+  }
+
+  &__circuit-entries {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+  }
+
+  &__entries-category {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  &__entries-category-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: $color-text-muted;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  &__entries-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  &__entry-item {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    padding: 0.8rem 1.2rem;
+    background-color: $color-bg-secondary;
+    border-radius: $radius-sm;
+    font-size: 1.6rem;
+  }
+
+  &__entry-pos {
+    width: 2.4rem;
+    text-align: center;
+    color: $color-text-muted;
+    font-weight: 600;
+  }
+
+  &__entry-name {
+    flex: 1;
+    color: $color-text;
+  }
+
+  &__entry-car {
+    color: $color-text-muted;
+    min-width: 80px;
+  }
+
+  &__entry-time {
+    font-weight: 600;
+    color: $color-accent;
+    min-width: 80px;
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.4rem;
+  }
+
+  &__input {
+    width: 100%;
+    padding: 1.4rem 1.6rem;
+    background-color: $color-bg;
+    border: 1px solid $color-border;
+    border-radius: $radius-sm;
+    color: $color-text;
+    font-size: 1.6rem;
+
+    &:focus {
+      outline: none;
+      border-color: $color-primary-light;
+    }
+  }
+
+  &__select {
+    width: 100%;
+    padding: 1.4rem 1.6rem;
+    background-color: $color-bg;
+    border: 1px solid $color-border;
+    border-radius: $radius-sm;
+    color: $color-text;
+    font-size: 1.6rem;
+
+    &:focus {
+      outline: none;
+      border-color: $color-primary-light;
+    }
+  }
+
+  &__label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    font-size: 1.6rem;
+    color: $color-text-muted;
+  }
+
+  &__btn {
+    padding: 1.2rem 2.4rem;
+    border: none;
+    border-radius: $radius-sm;
+    font-size: 1.6rem;
+    font-weight: 600;
+    transition: opacity 0.15s;
+
+    &:hover {
+      opacity: 0.85;
+    }
+
+    &--primary {
+      background-color: $color-primary;
+      color: #fff;
+    }
+
+    &--secondary {
+      background-color: $color-bg-card;
+      color: $color-text;
+      border: 1px solid $color-border;
+    }
+
+    &--danger {
+      background-color: $color-danger;
+      color: #fff;
+    }
+  }
+
+  &__modal {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+  }
+
+  &__modal-content {
+    background-color: $color-bg-secondary;
+    border: 1px solid $color-border;
+    border-radius: $radius-lg;
+    padding: 3.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+    min-width: 400px;
+  }
+
+  &__modal-actions {
+    display: flex;
+    gap: 1.2rem;
+    justify-content: space-evenly;
+  }
+}
