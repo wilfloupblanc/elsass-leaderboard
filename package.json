@@ -1,5 +1,9 @@
 {
   "name": "elsass-leaderboard",
   "private": true,
-  "workspaces": ["apps/admin", "apps/display"]
+  "workspaces": [
+    "apps/admin",
+    "apps/display"
+  ],
+  "version": "0.0.1"
 }
