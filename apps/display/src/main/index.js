@@ -42,6 +42,8 @@ ipcMain.handle('disconnect', () => {
     disconnect()
 })
 
+app.commandLine.appendSwitch('force-device-scale-factor', '1')
+
 app.whenReady().then(() => {
     createDisplayWindow()
 })
