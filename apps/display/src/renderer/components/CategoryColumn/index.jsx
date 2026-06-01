@@ -22,6 +22,11 @@ const TROPHY = {
 }
 
 export const CategoryColumn = ({ category, entries }) => {
+    const paddedEntries = [
+        ...entries,
+        ...Array(Math.max(0, 10 - entries.length)).fill(null)
+    ]
+
     return (
         <article className="category">
             <div className="category__header">
@@ -29,14 +34,18 @@ export const CategoryColumn = ({ category, entries }) => {
                 <h3 className="category__title">{CATEGORY_LABELS[category]}</h3>
             </div>
             <ul className="category__list">
-                {entries.map((entry, i) => (
-                    <li key={entry.id} className={`category__entry ${i < 3 ? 'category__entry--podium' : ''}`}>
-                        <span className="category__pos">
-                            {i < 3 ? TROPHY[i] : i + 1}
-                        </span>
-                        <span className="category__name">{entry.name}</span>
-                        <span className="category__car">{category === 'f1' ? entry.year : entry.car}</span>
-                        <span className="category__time">{entry.time}</span>
+                {paddedEntries.map((entry, i) => (
+                    <li key={entry?.id || `empty-${i}`} className={`category__entry ${i < 3 ? 'category__entry--podium' : ''}`}>
+                        {entry ? (
+                            <>
+                                <span className="category__pos">
+                                    {i < 3 ? TROPHY[i] : i + 1}
+                                </span>
+                                <span className="category__name">{entry.name}</span>
+                                <span className="category__car">{category === 'f1' ? entry.year : entry.car}</span>
+                                <span className="category__time">{entry.time}</span>
+                            </>
+                        ) : null}
                     </li>
                 ))}
             </ul>
