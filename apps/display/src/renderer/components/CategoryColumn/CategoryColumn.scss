@@ -20,13 +20,13 @@
   }
 
   &__car-img {
-    height: 10rem;
+    height: 12rem;
     width: auto;
     object-fit: contain;
   }
 
   &__title {
-    font-size: 4rem;
+    font-size: 6rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -68,9 +68,9 @@
   }
 
   &__pos {
-    width: 3.5rem;
+    width: 5rem;
     text-align: center;
-    font-size: 3.5rem;
+    font-size: 5rem;
     font-weight: 700;
     color: $color-text-muted;
     flex-shrink: 0;
@@ -78,14 +78,14 @@
 
   &__name {
     flex: 1;
-    font-size: 3.5rem;
+    font-size: 5rem;
     font-weight: 600;
     color: $color-text;
     text-transform: uppercase;
   }
 
   &__car {
-    font-size: 3.5rem;
+    font-size: 5rem;
     color: $color-text;
     text-transform: uppercase;
     min-width: 10rem;
@@ -93,7 +93,7 @@
   }
 
   &__time {
-    font-size: 3.5rem;
+    font-size: 5rem;
     font-weight: 700;
     color: $color-accent;
     min-width: 12rem;

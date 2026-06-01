@@ -68,7 +68,7 @@
   }
 
   &__track-img {
-    height: 15rem;
+    height: 20rem;
     width: auto;
     object-fit: contain;
     filter: brightness(0) invert(1);
@@ -76,7 +76,7 @@
   }
 
   &__circuit-name {
-    font-size: 5rem;
+    font-size: 7rem;
     font-weight: 800;
     text-transform: uppercase;
     color: $color-text;
