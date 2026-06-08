@@ -7,10 +7,10 @@ export const DisplayView = ({ state }) => {
     const circuits = state?.circuits || {}
     const settings = state?.settings || { slideDuration: 10 }
     const [currentIndex, setCurrentIndex] = useState(0)
-
     const circuitList = Object.keys(circuits)
     const currentCircuit = circuitList[currentIndex]
     const currentData = circuits[currentCircuit]
+    const activeCategories = currentData?.activeCategories ?? []
 
     useEffect(() => {
         if (circuitList.length <= 1) return
@@ -49,11 +49,21 @@ export const DisplayView = ({ state }) => {
                     <h2 className="leaderboard__circuit-name">{currentCircuit}</h2>
                 </article>
             </section>
+
             <section className="leaderboard__categories">
-                <CategoryColumn category="hypercar" entries={currentData?.hypercar || []} />
-                <CategoryColumn category="f1" entries={currentData?.f1 || []} />
-                <CategoryColumn category="gt3" entries={currentData?.gt3 || []} />
+                {activeCategories.length > 0 ? (
+                    activeCategories.map(cat => (
+                        <CategoryColumn
+                            key={cat}
+                            category={cat}
+                            entries={currentData?.[cat] || []}
+                        />
+                    ))
+                ) : (
+                    <p className="leaderboard__no-categories">Aucune catégorie active pour ce circuit.</p>
+                )}
             </section>
+
             <section className="leaderboard__footer">
                 {circuitList.map((name, i) => (
                     <span

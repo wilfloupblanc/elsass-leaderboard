@@ -1,5 +1,4 @@
 const { contextBridge, ipcRenderer } = require('electron')
-
 contextBridge.exposeInMainWorld('api', {
     getDB: () => ipcRenderer.invoke('get-db'),
     updateSettings: (settings) => ipcRenderer.invoke('update-settings', settings),
@@ -8,6 +7,12 @@ contextBridge.exposeInMainWorld('api', {
     deleteCircuit: (name) => ipcRenderer.invoke('delete-circuit', { name }),
     uploadTrackImage: (circuitName, filePath, fileName) =>
         ipcRenderer.invoke('upload-track-image', { circuitName, filePath, fileName }),
+    addVehicle: (name) => ipcRenderer.invoke('add-vehicle', { name }),
+    deleteVehicle: (name) => ipcRenderer.invoke('delete-vehicle', { name }),
+    uploadVehicleImage: (vehicleName, filePath, fileName) =>
+        ipcRenderer.invoke('upload-vehicle-image', { vehicleName, filePath, fileName }),
+    toggleCircuitCategory: (circuitName, cat) =>
+        ipcRenderer.invoke('toggle-circuit-category', { circuitName, cat }),
     addEntry: (circuitName, category, entry) =>
         ipcRenderer.invoke('add-entry', { circuitName, category, entry }),
     deleteEntry: (circuitName, category, id) =>

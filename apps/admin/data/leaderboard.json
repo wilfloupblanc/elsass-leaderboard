@@ -4,116 +4,31 @@
     "adminPassword": "elsass"
   },
   "circuits": {
-    "Spa-Francorchamps": {
-      "trackImage": "spa-francorchamps.png",
-      "hypercar": [
+    "Le Mans": {
+      "trackImage": null,
+      "HyperCar": [],
+      "activeCategories": [
+        "HyperCar",
+        "GT3"
+      ],
+      "GT3": [
         {
-          "id": "14833e04-823c-492a-b55b-95faa47a0552",
+          "id": "238fed0f-8b31-47b1-b1a2-53153031f716",
           "name": "Julien ZAU",
           "car": "Peugeot",
           "year": null,
-          "time": "1:05.300",
-          "timeMs": 65300
-        }
-      ],
-      "f1": [],
-      "gt3": [
-        {
-          "id": "05357704-e850-4855-bfeb-7a93ed1af3b4",
-          "name": "Tristan GRA",
-          "car": "Ferrari",
-          "year": null,
-          "time": "2:05.180",
-          "timeMs": 125180
-        },
-        {
-          "id": "498b6f27-ff33-41c3-9ee7-99807867b265",
-          "name": "Yoann LHE",
-          "car": "Ferrari",
-          "year": null,
-          "time": "2:08.248",
-          "timeMs": 128248
-        },
-        {
-          "id": "d843345e-3801-47b0-9108-390155286207",
-          "name": "Charlie CLO",
-          "car": "Mercedes",
-          "year": null,
-          "time": "2:15.300",
-          "timeMs": 135300
-        },
-        {
-          "id": "7e7e0bb5-fed0-4357-87ef-8b74d781d565",
-          "name": "Benjamin BON",
-          "car": "BMW",
-          "year": null,
-          "time": "2:16.000",
-          "timeMs": 136000
-        },
-        {
-          "id": "b9e5a0b2-4e57-48f9-888c-ce1d18462163",
-          "name": "Julien ZAU",
-          "car": "Porsche",
-          "year": null,
-          "time": "2:18.220",
-          "timeMs": 138220
-        },
-        {
-          "id": "d0c300df-b2ad-4d95-bebf-a12f400be05b",
-          "name": "Michel MOR",
-          "car": "Porsche",
-          "year": null,
-          "time": "2:19.478",
-          "timeMs": 139478
-        },
-        {
-          "id": "361b1dbf-9656-42c8-ac52-4837c5b01d34",
-          "name": "Camille NAU",
-          "car": "BMW",
-          "year": null,
-          "time": "2:22.030",
-          "timeMs": 142030
-        },
-        {
-          "id": "b0fec536-b0bf-459e-8cc8-b033dc6b4961",
-          "name": "Pouet POU",
-          "car": "McLaren",
-          "year": null,
-          "time": "2:26.520",
-          "timeMs": 146520
-        },
-        {
-          "id": "432e6c51-f93b-493f-b5ca-4f0dab5cb38b",
-          "name": "test TES",
-          "car": "Ferrari",
-          "year": null,
-          "time": "2:27.132",
-          "timeMs": 147132
-        },
-        {
-          "id": "baec045f-f93c-4f93-af18-8932be1df235",
-          "name": "Jean MIC",
-          "car": "Ferrari",
-          "year": null,
-          "time": "2:30.002",
-          "timeMs": 150002
+          "time": "3:36.540",
+          "timeMs": 216540
         }
       ]
+    }
+  },
+  "vehicles": {
+    "HyperCar": {
+      "vehicleImage": null
     },
-    "Le Mans Sarthe": {
-      "trackImage": "le-mans-sarthe.webp",
-      "hypercar": [],
-      "f1": [],
-      "gt3": [
-        {
-          "id": "ae26e719-73c0-4af1-acdf-196b912acac8",
-          "name": "Tristan GRA",
-          "car": "Ferrari",
-          "year": null,
-          "time": "4:08.180",
-          "timeMs": 248180
-        }
-      ]
+    "GT3": {
+      "vehicleImage": null
     }
   }
 }

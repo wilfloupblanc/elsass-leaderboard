@@ -2,7 +2,7 @@ import { ipcMain } from 'electron'
 import fs from 'fs'
 import path from 'path'
 import { v4 as uuidv4 } from 'uuid'
-import { readDB, writeDB, getCircuitsDir } from './store.js'
+import { readDB, writeDB, getCircuitsDir, getVehiclesDir } from './store.js'
 import { broadcast } from './server.js'
 
 function timeToMs(time) {
@@ -31,7 +31,39 @@ export function registerIpcHandlers() {
     ipcMain.handle('add-circuit', (_, { name }) => {
         const db = readDB()
         if (db.circuits[name]) return { error: 'Ce circuit existe déjà.' }
-        db.circuits[name] = { trackImage: null, hypercar: [], f1: [], gt3: [] }
+        const categories = Object.keys(db.vehicles).reduce((acc, cat) => {
+            acc[cat] = []
+            return acc
+        }, {})
+        db.circuits[name] = { trackImage: null, activeCategories: [], ...categories }
+        writeDB(db)
+        broadcastUpdate()
+        return db
+    })
+
+    ipcMain.handle('add-vehicle', (_, { name }) => {
+        const db = readDB()
+        if (db.vehicles[name]) return { error: 'Cette catégorie de véhicule existe déjà' }
+        db.vehicles[name] = { vehicleImage: null }
+        Object.keys(db.circuits).forEach(circuitName => {
+            if (!db.circuits[circuitName][name]) {
+                db.circuits[circuitName][name] = []
+            }
+        })
+        writeDB(db)
+        broadcastUpdate()
+        return db
+    })
+
+    ipcMain.handle('delete-vehicle', (_, { name }) => {
+        const db = readDB()
+        if (!db.vehicles[name]) return { error: 'Catégorie introuvable.' }
+        delete db.vehicles[name]
+        Object.keys(db.circuits).forEach(circuitName => {
+            delete db.circuits[circuitName][name]
+            const active = db.circuits[circuitName].activeCategories ?? []
+            db.circuits[circuitName].activeCategories = active.filter(c => c !== name)
+        })
         writeDB(db)
         broadcastUpdate()
         return db
@@ -51,6 +83,19 @@ export function registerIpcHandlers() {
         return db
     })
 
+    ipcMain.handle('toggle-circuit-category', (_, { circuitName, cat }) => {
+        const db = readDB()
+        const circuit = db.circuits[circuitName]
+        if (!circuit) return { error: 'Circuit introuvable.' }
+        const active = circuit.activeCategories ?? []
+        circuit.activeCategories = active.includes(cat)
+            ? active.filter(c => c !== cat)
+            : [...active, cat]
+        writeDB(db)
+        broadcastUpdate()
+        return db
+    })
+
     ipcMain.handle('upload-track-image', (_, { circuitName, filePath, fileName }) => {
         const db = readDB()
         if (!db.circuits[circuitName]) return { error: 'Circuit introuvable.' }
@@ -59,6 +104,19 @@ export function registerIpcHandlers() {
         const destPath = path.join(getCircuitsDir(), safeName)
         fs.copyFileSync(filePath, destPath)
         db.circuits[circuitName].trackImage = safeName
+        writeDB(db)
+        broadcastUpdate()
+        return db
+    })
+
+    ipcMain.handle('upload-vehicle-image', (_, { vehicleName, filePath, fileName }) => {
+        const db = readDB()
+        if (!db.vehicles[vehicleName]) return { error: 'Catégorie introuvable.' }
+        const ext = path.extname(fileName)
+        const safeName = vehicleName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') + ext
+        const destPath = path.join(getVehiclesDir(), safeName)
+        fs.copyFileSync(filePath, destPath)
+        db.vehicles[vehicleName].vehicleImage = safeName
         writeDB(db)
         broadcastUpdate()
         return db

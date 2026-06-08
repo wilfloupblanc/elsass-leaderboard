@@ -3,8 +3,8 @@ import elsassLogo from '@/assets/elsass-logo.png'
 import './ConnectView.scss'
 
 export const ConnectView = ({ setConnected }) => {
-    const [ip, setIp] = useState('')
-    const [port, setPort] = useState('3001')
+    const [ip, setIp] = useState(() => localStorage.getItem('server-ip') || '')
+    const [port, setPort] = useState(() => localStorage.getItem('server-port') || '3001')
     const [status, setStatus] = useState('idle')
 
     useEffect(() => {
@@ -20,8 +20,21 @@ export const ConnectView = ({ setConnected }) => {
         return () => window.api.offConnectionStatus(handler)
     }, [setConnected])
 
+    useEffect(() => {
+        const savedIp = localStorage.getItem('server-ip')
+        const savedPort = localStorage.getItem('server-port') || '3001'
+        if (savedIp) {
+            setIp(savedIp)
+            setPort(savedPort)
+            setStatus('connecting')
+            window.api.connect(savedIp, parseInt(savedPort))
+        }
+    }, [])
+
     const handleConnect = () => {
         if (!ip.trim()) return
+        localStorage.setItem('server-ip', ip.trim())
+        localStorage.setItem('server-port', port)
         setStatus('connecting')
         window.api.connect(ip.trim(), parseInt(port))
     }

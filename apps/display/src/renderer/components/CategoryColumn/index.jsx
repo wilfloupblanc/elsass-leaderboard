@@ -2,7 +2,6 @@ import './CategoryColumn.scss'
 import hypercaImg from '@/assets/hypercar.webp'
 import formulaImg from '@/assets/formula.webp'
 import gt3Img from '@/assets/gt3.webp'
-
 const CATEGORY_IMAGES = {
     hypercar: hypercaImg,
     f1: formulaImg,
@@ -22,6 +21,10 @@ const TROPHY = {
 }
 
 export const CategoryColumn = ({ category, entries }) => {
+    const categoryKey = category.toLowerCase()
+    const image = CATEGORY_IMAGES[categoryKey] ?? gt3Img
+    const label = CATEGORY_LABELS[categoryKey] ?? category
+
     const paddedEntries = [
         ...entries,
         ...Array(Math.max(0, 10 - entries.length)).fill(null)
@@ -30,8 +33,8 @@ export const CategoryColumn = ({ category, entries }) => {
     return (
         <article className="category">
             <div className="category__header">
-                <img src={CATEGORY_IMAGES[category]} alt={category} className="category__car-img" />
-                <h3 className="category__title">{CATEGORY_LABELS[category]}</h3>
+                <img src={image} alt={label} className="category__car-img" />
+                <h3 className="category__title">{label}</h3>
             </div>
             <ul className="category__list">
                 {paddedEntries.map((entry, i) => (
@@ -42,7 +45,7 @@ export const CategoryColumn = ({ category, entries }) => {
                                     {i < 3 ? TROPHY[i] : i + 1}
                                 </span>
                                 <span className="category__name">{entry.name}</span>
-                                <span className="category__car">{category === 'f1' ? entry.year : entry.car}</span>
+                                <span className="category__car">{categoryKey === 'f1' ? entry.year : entry.car}</span>
                                 <span className="category__time">{entry.time}</span>
                             </>
                         ) : null}

@@ -1,33 +1,42 @@
 import { useState, useEffect } from 'react'
-import {useDispatch, useSelector} from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import './AdminView.scss'
-import {setDB} from "@/store/leaderboardSlice.js"
+import { setDB } from '@/store/leaderboardSlice.js'
 import elsassLogo from '@/assets/elsass-logo.png'
 
 export const AdminView = ({ isUnlocked, setIsUnlocked }) => {
-    const { circuits, settings } = useSelector(state => state.leaderboard)
+    const { circuits, vehicles, settings } = useSelector(state => state.leaderboard)
+    const circuitList = Object.keys(circuits ?? {})
+    const vehicleList = Object.keys(vehicles ?? {})
+
     const [newCircuitName, setNewCircuitName] = useState('')
+    const [newVehicleName, setNewVehicleName] = useState('')
     const [selectedCircuit, setSelectedCircuit] = useState('')
-    const [selectedCategory, setSelectedCategory] = useState('hypercar')
+    const [selectedCategory, setSelectedCategory] = useState('')
     const [entryName, setEntryName] = useState('')
     const [entryCar, setEntryCar] = useState('')
     const [entryYear, setEntryYear] = useState('')
     const [entryTime, setEntryTime] = useState('')
-    const [slideDuration, setSlideDuration] = useState(settings.slideDuration)
+    const [slideDuration, setSlideDuration] = useState(settings?.slideDuration ?? 10)
     const [adminPassword, setAdminPassword] = useState('')
     const [showModal, setShowModal] = useState(false)
     const [modalPassword, setModalPassword] = useState('')
     const [pendingAction, setPendingAction] = useState(null)
     const [serverInfo, setServerInfo] = useState({ ip: '', port: '' })
     const [expandedCircuits, setExpandedCircuits] = useState({})
+    const [vehiclesExpanded, setVehiclesExpanded] = useState(true)
     const dispatch = useDispatch()
-
-    const circuitList = Object.keys(circuits)
 
     useEffect(() => {
         Promise.all([window.api.getLocalIP(), window.api.getServerPort()])
             .then(([ip, port]) => setServerInfo({ ip, port }))
     }, [])
+
+    useEffect(() => {
+        if (!selectedCircuit) { setSelectedCategory(''); return }
+        const active = circuits[selectedCircuit]?.activeCategories ?? []
+        setSelectedCategory(active[0] ?? '')
+    }, [selectedCircuit])
 
     const toggleCircuit = (name) => {
         setExpandedCircuits(prev => ({ ...prev, [name]: !prev[name] }))
@@ -42,6 +51,8 @@ export const AdminView = ({ isUnlocked, setIsUnlocked }) => {
         }
     }
 
+    // ── Circuits ────────────────────────────────────────────────────────────
+
     const handleAddCircuit = () => requireAuth(async () => {
         if (!newCircuitName.trim()) return
         const db = await window.api.addCircuit(newCircuitName.trim())
@@ -53,8 +64,46 @@ export const AdminView = ({ isUnlocked, setIsUnlocked }) => {
         if (!db.error) dispatch(setDB(db))
     })
 
+    const handleUploadTrackImage = (circuitName) => requireAuth(async () => {
+        const filePath = await window.api.openFileDialog()
+        if (!filePath) return
+        const fileName = filePath.split('/').pop()
+        const db = await window.api.uploadTrackImage(circuitName, filePath, fileName)
+        if (!db.error) dispatch(setDB(db))
+    })
+
+    // ── Catégories actives par circuit ──────────────────────────────────────
+
+    const handleToggleCategory = (circuitName, cat) => requireAuth(async () => {
+        const db = await window.api.toggleCircuitCategory(circuitName, cat)
+        if (!db.error) dispatch(setDB(db))
+    })
+
+    // ── Véhicules ───────────────────────────────────────────────────────────
+
+    const handleAddVehicle = () => requireAuth(async () => {
+        if (!newVehicleName.trim()) return
+        const db = await window.api.addVehicle(newVehicleName.trim())
+        if (!db.error) { dispatch(setDB(db)); setNewVehicleName('') }
+    })
+
+    const handleDeleteVehicle = (name) => requireAuth(async () => {
+        const db = await window.api.deleteVehicle(name)
+        if (!db.error) dispatch(setDB(db))
+    })
+
+    const handleUploadVehicleImage = (vehicleName) => requireAuth(async () => {
+        const filePath = await window.api.openFileDialog()
+        if (!filePath) return
+        const fileName = filePath.split('/').pop()
+        const db = await window.api.uploadVehicleImage(vehicleName, filePath, fileName)
+        if (!db.error) dispatch(setDB(db))
+    })
+
+    // ── Entrées ─────────────────────────────────────────────────────────────
+
     const handleAddEntry = () => requireAuth(async () => {
-        if (!selectedCircuit || !entryName.trim() || !entryTime.trim()) return
+        if (!selectedCircuit || !selectedCategory || !entryName.trim() || !entryTime.trim()) return
         const entry = {
             name: entryName,
             car: selectedCategory !== 'f1' ? entryCar : null,
@@ -73,6 +122,8 @@ export const AdminView = ({ isUnlocked, setIsUnlocked }) => {
         if (!db.error) dispatch(setDB(db))
     })
 
+    // ── Paramètres ──────────────────────────────────────────────────────────
+
     const handleSaveSettings = () => requireAuth(async () => {
         const db = await window.api.updateSettings({
             slideDuration: Number(slideDuration),
@@ -81,13 +132,7 @@ export const AdminView = ({ isUnlocked, setIsUnlocked }) => {
         if (!db.error) { dispatch(setDB(db)); setAdminPassword('') }
     })
 
-    const handleUploadImage = (circuitName) => requireAuth(async () => {
-        const filePath = await window.api.openFileDialog()
-        if (!filePath) return
-        const fileName = filePath.split('/').pop()
-        const db = await window.api.uploadTrackImage(circuitName, filePath, fileName)
-        if (!db.error) dispatch(setDB(db))
-    })
+    // ── Modal ───────────────────────────────────────────────────────────────
 
     const handleModalSubmit = async () => {
         const ok = await window.api.checkPassword(modalPassword)
@@ -95,14 +140,22 @@ export const AdminView = ({ isUnlocked, setIsUnlocked }) => {
             setIsUnlocked(true)
             setShowModal(false)
             setModalPassword('')
-            if (pendingAction) {
-                pendingAction()
-                setPendingAction(null)
-            }
+            if (pendingAction) { pendingAction(); setPendingAction(null) }
         } else {
             setModalPassword('')
         }
     }
+
+    // ── Helpers UI ──────────────────────────────────────────────────────────
+
+    const activeCategories = (circuitName) =>
+        circuits[circuitName]?.activeCategories ?? []
+
+    const availableCategories = selectedCircuit
+        ? activeCategories(selectedCircuit)
+        : []
+
+    // ── Render ──────────────────────────────────────────────────────────────
 
     return (
         <>
@@ -115,6 +168,59 @@ export const AdminView = ({ isUnlocked, setIsUnlocked }) => {
             </header>
 
             <main className="admin">
+
+                {/* ── Véhicules globaux ── */}
+                <section className="admin__section">
+                    <div className="admin__section-header">
+                        <h2 className="admin__section-title">Catégories de véhicules</h2>
+                        <button
+                            className="admin__btn admin__btn--secondary"
+                            onClick={() => setVehiclesExpanded(prev => !prev)}
+                        >
+                            {vehiclesExpanded ? '▲' : '▼'}
+                        </button>
+                    </div>
+
+                    {vehiclesExpanded && (
+                        <>
+                            <article className="admin__vehicle-add">
+                                <input
+                                    className="admin__input"
+                                    type="text"
+                                    placeholder="Nom de la catégorie"
+                                    value={newVehicleName}
+                                    onChange={e => setNewVehicleName(e.target.value)}
+                                />
+                                <button className="admin__btn admin__btn--primary" onClick={handleAddVehicle}>
+                                    Ajouter
+                                </button>
+                            </article>
+                            <ul className="admin__vehicle-list">
+                                {vehicleList.map(name => (
+                                    <li key={name} className="admin__vehicle-item">
+                                        <span className="admin__vehicle-name">{name}</span>
+                                        <div className="admin__vehicle-actions">
+                                            <button
+                                                className="admin__btn admin__btn--secondary"
+                                                onClick={() => handleUploadVehicleImage(name)}
+                                            >
+                                                Upload image
+                                            </button>
+                                            <button
+                                                className="admin__btn admin__btn--danger"
+                                                onClick={() => handleDeleteVehicle(name)}
+                                            >
+                                                Supprimer
+                                            </button>
+                                        </div>
+                                    </li>
+                                ))}
+                            </ul>
+                        </>
+                    )}
+                </section>
+
+                {/* ── Circuits ── */}
                 <section className="admin__section">
                     <h2 className="admin__section-title">Circuits</h2>
                     <article className="admin__circuit-add">
@@ -129,16 +235,23 @@ export const AdminView = ({ isUnlocked, setIsUnlocked }) => {
                             Ajouter
                         </button>
                     </article>
+
                     <ul className="admin__circuit-list">
                         {circuitList.map(name => (
                             <li key={name} className="admin__circuit-item">
                                 <div className="admin__circuit-header">
                                     <span className="admin__circuit-name">{name}</span>
                                     <div className="admin__circuit-actions">
-                                        <button className="admin__btn admin__btn--secondary" onClick={() => handleUploadImage(name)}>
-                                            Upload image tracé
+                                        <button
+                                            className="admin__btn admin__btn--secondary"
+                                            onClick={() => handleUploadTrackImage(name)}
+                                        >
+                                            Upload tracé
                                         </button>
-                                        <button className="admin__btn admin__btn--secondary" onClick={() => toggleCircuit(name)}>
+                                        <button
+                                            className="admin__btn admin__btn--secondary"
+                                            onClick={() => toggleCircuit(name)}
+                                        >
                                             {expandedCircuits[name] ? '▲' : '▼'}
                                         </button>
                                         <button
@@ -149,29 +262,52 @@ export const AdminView = ({ isUnlocked, setIsUnlocked }) => {
                                         </button>
                                     </div>
                                 </div>
+
                                 {expandedCircuits[name] && (
-                                    <div className="admin__circuit-entries">
-                                        {['hypercar', 'f1', 'gt3'].map(cat => (
-                                            <div key={cat} className="admin__entries-category">
-                                                <h3 className="admin__entries-category-title">{cat.toUpperCase()}</h3>
-                                                <ul className="admin__entries-list">
-                                                    {circuits[name][cat].map((entry, i) => (
-                                                        <li key={entry.id} className="admin__entry-item">
-                                                            <span className="admin__entry-pos">{i + 1}</span>
-                                                            <span className="admin__entry-name">{entry.name}</span>
-                                                            <span className="admin__entry-car">{entry.car || entry.year}</span>
-                                                            <span className="admin__entry-time">{entry.time}</span>
-                                                            <button
-                                                                className="admin__btn admin__btn--danger"
-                                                                onClick={() => handleDeleteEntry(name, cat, entry.id)}
-                                                            >
-                                                                Supprimer
-                                                            </button>
-                                                        </li>
-                                                    ))}
-                                                </ul>
+                                    <div className="admin__circuit-detail">
+
+                                        {/* Catégories actives pour ce circuit */}
+                                        <div className="admin__circuit-categories">
+                                            <h3 className="admin__subsection-title">Catégories actives</h3>
+                                            <div className="admin__category-toggles">
+                                                {vehicleList.map(cat => (
+                                                    <label key={cat} className="admin__category-toggle">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={activeCategories(name).includes(cat)}
+                                                            onChange={() => handleToggleCategory(name, cat)}
+                                                        />
+                                                        {cat}
+                                                    </label>
+                                                ))}
                                             </div>
-                                        ))}
+                                        </div>
+
+                                        {/* Entrées par catégorie active */}
+                                        <div className="admin__circuit-entries">
+                                            {activeCategories(name).map(cat => (
+                                                <div key={cat} className="admin__entries-category">
+                                                    <h3 className="admin__entries-category-title">{cat.toUpperCase()}</h3>
+                                                    <ul className="admin__entries-list">
+                                                        {(circuits[name][cat] ?? []).map((entry, i) => (
+                                                            <li key={entry.id} className="admin__entry-item">
+                                                                <span className="admin__entry-pos">{i + 1}</span>
+                                                                <span className="admin__entry-name">{entry.name}</span>
+                                                                <span className="admin__entry-car">{entry.car || entry.year}</span>
+                                                                <span className="admin__entry-time">{entry.time}</span>
+                                                                <button
+                                                                    className="admin__btn admin__btn--danger"
+                                                                    onClick={() => handleDeleteEntry(name, cat, entry.id)}
+                                                                >
+                                                                    Supprimer
+                                                                </button>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            ))}
+                                        </div>
+
                                     </div>
                                 )}
                             </li>
@@ -180,6 +316,8 @@ export const AdminView = ({ isUnlocked, setIsUnlocked }) => {
                 </section>
 
                 <section className="admin__row">
+
+                    {/* ── Ajouter un temps ── */}
                     <article className="admin__section">
                         <h2 className="admin__section-title">Ajouter un temps</h2>
                         <div className="admin__form">
@@ -193,15 +331,19 @@ export const AdminView = ({ isUnlocked, setIsUnlocked }) => {
                                     <option key={name} value={name}>{name}</option>
                                 ))}
                             </select>
+
                             <select
                                 className="admin__select"
                                 value={selectedCategory}
                                 onChange={e => setSelectedCategory(e.target.value)}
+                                disabled={!selectedCircuit}
                             >
-                                <option value="hypercar">Hypercar</option>
-                                <option value="f1">Formula 1</option>
-                                <option value="gt3">GT3</option>
+                                <option value="">-- Catégorie --</option>
+                                {availableCategories.map(name => (
+                                    <option key={name} value={name}>{name}</option>
+                                ))}
                             </select>
+
                             <input
                                 className="admin__input"
                                 type="text"
@@ -209,6 +351,7 @@ export const AdminView = ({ isUnlocked, setIsUnlocked }) => {
                                 value={entryName}
                                 onChange={e => setEntryName(e.target.value)}
                             />
+
                             {selectedCategory === 'f1' ? (
                                 <input
                                     className="admin__input"
@@ -226,6 +369,7 @@ export const AdminView = ({ isUnlocked, setIsUnlocked }) => {
                                     onChange={e => setEntryCar(e.target.value)}
                                 />
                             )}
+
                             <input
                                 className="admin__input"
                                 type="text"
@@ -233,12 +377,18 @@ export const AdminView = ({ isUnlocked, setIsUnlocked }) => {
                                 value={entryTime}
                                 onChange={e => setEntryTime(e.target.value)}
                             />
-                            <button className="admin__btn admin__btn--primary" onClick={handleAddEntry}>
+
+                            <button
+                                className="admin__btn admin__btn--primary"
+                                onClick={handleAddEntry}
+                                disabled={!selectedCircuit || !selectedCategory}
+                            >
                                 Ajouter le temps
                             </button>
                         </div>
                     </article>
 
+                    {/* ── Paramètres ── */}
                     <article className="admin__section">
                         <h2 className="admin__section-title">Paramètres</h2>
                         <div className="admin__form">
@@ -268,9 +418,11 @@ export const AdminView = ({ isUnlocked, setIsUnlocked }) => {
                             </button>
                         </div>
                     </article>
+
                 </section>
 
-                {showModal &&
+                {/* ── Modal auth ── */}
+                {showModal && (
                     <section className="admin__modal">
                         <article className="admin__modal-content">
                             <label className="admin__label">Mot de passe administrateur</label>
@@ -280,18 +432,23 @@ export const AdminView = ({ isUnlocked, setIsUnlocked }) => {
                                 value={modalPassword}
                                 onChange={e => setModalPassword(e.target.value)}
                                 onKeyDown={e => e.key === 'Enter' && handleModalSubmit()}
+                                autoFocus
                             />
                             <div className="admin__modal-actions">
                                 <button className="admin__btn admin__btn--primary" onClick={handleModalSubmit}>
                                     Valider
                                 </button>
-                                <button className="admin__btn admin__btn--secondary" onClick={() => { setShowModal(false); setModalPassword('') }}>
+                                <button
+                                    className="admin__btn admin__btn--secondary"
+                                    onClick={() => { setShowModal(false); setModalPassword('') }}
+                                >
                                     Annuler
                                 </button>
                             </div>
                         </article>
                     </section>
-                }
+                )}
+
             </main>
         </>
     )
