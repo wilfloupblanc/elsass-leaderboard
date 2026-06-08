@@ -4,7 +4,7 @@ import path from 'path'
 
 const DATA_DIR = app.isPackaged
     ? path.join(app.getPath('userData'), 'data')
-    : path.join(process.cwd(), 'data')
+    : path.join(import.meta.dirname, '..', 'data')
 const CIRCUITS_DIR = path.join(DATA_DIR, 'circuits')
 const VEHICLES_DIR = path.join(DATA_DIR, 'vehicles')
 const DB_PATH = path.join(DATA_DIR, 'leaderboard.json')

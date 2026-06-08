@@ -1,0 +1,29 @@
+{
+  "settings": {
+    "slideDuration": 10,
+    "adminPassword": "elsass"
+  },
+  "circuits": {
+    "Spa-francorchamps": {
+      "trackImage": null,
+      "activeCategories": [
+        "hypercar"
+      ],
+      "hypercar": [
+        {
+          "id": "4e815f48-23a4-4bb3-9ca4-27ea9cd6f66b",
+          "name": "Julien ZAU",
+          "car": "Peugeot",
+          "year": null,
+          "time": "1:32.465",
+          "timeMs": 92465
+        }
+      ]
+    }
+  },
+  "vehicles": {
+    "hypercar": {
+      "vehicleImage": "hypercar.jpg"
+    }
+  }
+}

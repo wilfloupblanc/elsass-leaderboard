@@ -11,6 +11,7 @@ export const DisplayView = ({ state }) => {
     const currentCircuit = circuitList[currentIndex]
     const currentData = circuits[currentCircuit]
     const activeCategories = currentData?.activeCategories ?? []
+    const vehicles = state?.vehicles || {}
 
     useEffect(() => {
         if (circuitList.length <= 1) return
@@ -57,6 +58,8 @@ export const DisplayView = ({ state }) => {
                             key={cat}
                             category={cat}
                             entries={currentData?.[cat] || []}
+                            vehicleImage={vehicles[cat]?.vehicleImage}
+                            serverUrl={state?.serverUrl}
                         />
                     ))
                 ) : (

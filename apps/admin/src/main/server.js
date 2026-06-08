@@ -2,7 +2,7 @@ import { WebSocketServer } from 'ws'
 import { createServer } from 'http'
 import express from 'express'
 import os from 'os'
-import { readDB, getCircuitsDir } from './store.js'
+import { readDB, getCircuitsDir, getVehiclesDir } from './store.js'
 
 let wss = null
 let httpServer = null
@@ -30,6 +30,7 @@ function buildMessage(db, port) {
 export function startServer(port = 3001) {
     const expressApp = express()
     expressApp.use('/circuits', express.static(getCircuitsDir()))
+    expressApp.use('/vehicles', express.static(getVehiclesDir()))
 
     httpServer = createServer(expressApp)
     wss = new WebSocketServer({ server: httpServer })

@@ -6,7 +6,16 @@
   "circuits": {
     "Le Mans": {
       "trackImage": null,
-      "HyperCar": [],
+      "HyperCar": [
+        {
+          "id": "5424dda1-aff6-40ac-b26c-f97325418b11",
+          "name": "Julien ZAU",
+          "car": "Aston Martin",
+          "year": null,
+          "time": "3:40.005",
+          "timeMs": 220005
+        }
+      ],
       "activeCategories": [
         "HyperCar",
         "GT3"
@@ -25,7 +34,7 @@
   },
   "vehicles": {
     "HyperCar": {
-      "vehicleImage": null
+      "vehicleImage": "hypercar.jpg"
     },
     "GT3": {
       "vehicleImage": null

@@ -20,10 +20,13 @@ const TROPHY = {
     2: '🥉'
 }
 
-export const CategoryColumn = ({ category, entries }) => {
+export const CategoryColumn = ({ category, entries, vehicleImage, serverUrl }) => {
     const categoryKey = category.toLowerCase()
-    const image = CATEGORY_IMAGES[categoryKey] ?? gt3Img
     const label = CATEGORY_LABELS[categoryKey] ?? category
+
+    const image = vehicleImage && serverUrl
+        ? `${serverUrl}/vehicles/${vehicleImage}`
+        : (CATEGORY_IMAGES[categoryKey] ?? gt3Img)
 
     const paddedEntries = [
         ...entries,
